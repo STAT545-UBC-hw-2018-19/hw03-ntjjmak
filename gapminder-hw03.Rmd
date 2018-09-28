@@ -1,0 +1,11 @@
+---
+title: "gapminder-hw03"
+author: "Nicole Mak"
+date: "28/09/2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
