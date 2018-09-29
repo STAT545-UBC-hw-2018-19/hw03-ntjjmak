@@ -9,3 +9,64 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+**First, let's load the data and the packages we will use.**
+
+```{r}
+library(gapminder)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+# Homework #3 assignment **Task Menu**:
+
+Get the maximum and minimum of GDP per capita for all continents.
+Look at the spread of GDP per capita within the continents.
+
+
+Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean.
+
+How is life expectancy changing over time on different continents?
+
+Report the absolute and/or relative abundance of countries with low life expectancy over time by continent: Compute some measure of worldwide life expectancy – you decide – a mean or median or some other quantile or perhaps your current age. Then determine how many countries on each continent have a life expectancy less than this benchmark, for each year.
+
+Find countries with interesting stories. Open-ended and, therefore, hard. Promising but unsuccessful attempts are encouraged. This will generate interesting questions to follow up on in class.
+
+## First exercise:
+
+Get the maximum and minimum of GDP per capita for all continents.
+Look at the spread of GDP per capita within the continents.
+
+```{r}
+gapminder %>% 
+  group_by(continent) %>% 
+  summarize(min(gdpPercap), max(gdpPercap))
+
+#structuring data by continent
+#then requesting that desired observation (minimum and maximum) be summarized in a table, by continent
+
+```
+
+## Second exercise
+Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean.
+
+```{r}
+gapminder %>% 
+  group_by(continent, year) %>% 
+  summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop))
+
+#This is a calculation of the weighted mean life expectancy by population for each continent. The means are separated by year so we can observe trends of change in lifeExp over time.
+
+
+```
+
+## Third exercise
+
+We can use the above information to make some figures which illustrate how life expectancy changes over time.
+
+How is life expectancy changing over time on different continents?
+
+```{r}
+
+```
+
