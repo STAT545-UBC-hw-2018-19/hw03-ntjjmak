@@ -6,9 +6,9 @@ Data exploration is done with Rstudio.
 
 Here are the links to the markdown files:
 
-1.
+1. R Markdown file: https://github.com/STAT545-UBC-students/hw03-ntjjmak/blob/master/gapminder-hw03.Rmd
 
-2.
+2. Markdown file: https://github.com/STAT545-UBC-students/hw03-ntjjmak/blob/master/gapminder-hw03.md
 
 
 ## Thanks for visiting!
