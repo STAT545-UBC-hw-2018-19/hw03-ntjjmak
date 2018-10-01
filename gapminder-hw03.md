@@ -97,7 +97,7 @@ gapminder %>%
 
 ![](gapminder-hw03_files/figure-gfm/distribution%20graphs-2.png)<!-- -->
 
-\#\#Second exercise
+## Second exercise
 
 *Compute a trimmed mean of life expectancy for different years. Or a
 weighted mean, weighting by population. Just try something other than
@@ -143,9 +143,11 @@ gapminder %>%
 #graphical representation of second exercise
 ```
 
-\#\#Third exercise We can use the above information to make some figures
-which illustrate how life expectancy changes over time. How is life
-expectancy changing over time on different continents?
+## Third exercise
+
+We can use the above information to make some figures which illustrate
+how life expectancy changes over time. How is life expectancy changing
+over time on different continents?
 
 ``` r
 gapminder %>%
@@ -172,7 +174,13 @@ gapminder %>%
 
 ![](gapminder-hw03_files/figure-gfm/change%20in%20lifeexp%20over%20time,%20graph-2.png)<!-- -->
 
-\#\#Fourth exercise
+You can see that most continents are following the same trajectory in
+life expectancy increase starting from the 50s (slopes are visually
+comparable). Asia is the only continent to rise above and start to catch
+up to the continents that it was behind of at teh start of the mid 20th
+century.
+
+## Fourth exercise
 
 *Report the absolute and/or relative abundance of countries with low
 life expectancy over time by continent: Compute some measure of
@@ -228,17 +236,8 @@ gapminder %>%
     ## 10 Afghanistan Asia       1997    41.8 22227415      635.   69.4
     ## # ... with 842 more rows
 
-``` r
-#Step 3: Visually approximate the number of countries with life expectancy below the median. Use aesthetics to set parameters which demonstrate countries not meeting or exceeding the benchmark.
- 
-gapminder %>%
- group_by(year) %>% 
- mutate(median = median(lifeExp)) %>%
- ggplot(aes(year, lifeExp)) +
- geom_jitter(aes(colour = (lifeExp < median)), alpha = 0.5)
-```
-
-![](gapminder-hw03_files/figure-gfm/median%20lifeExp%20as%20a%20benchmark-1.png)<!-- -->
+Just experimenting with a different approach to tabulate step
+2:
 
 ``` r
 #We can also use the `if_else` function to help us identify which countries are less than the benchmark median for each year. Let's identify those countries with low life expectancy with the word "lower".
@@ -265,7 +264,27 @@ gapminder %>%
     ## 10 Afghanistan Asia       1997    41.8 22227415      635.   69.4 lower    
     ## # ... with 1,694 more rows
 
-\#\#Fifth exercise
+Anyways, back to determining the relative abundance of countries with
+low life expectancy by
+continent….
+
+``` r
+#Step 3: Visually approximate the number of countries with life expectancy below the median. Use aesthetics to set parameters which demonstrate countries not meeting or exceeding the benchmark. Then use facetting to demonstrate the difference between continents.
+ 
+gapminder %>%
+ group_by(year) %>% 
+ mutate(median = median(lifeExp)) %>%
+ ggplot(aes(year, lifeExp)) +
+ geom_jitter(aes(colour = (lifeExp < median)), alpha = 0.5)+
+  facet_wrap(~ continent)
+```
+
+![](gapminder-hw03_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+
+We can really see the disproportionate number of countries with low life
+expectancy in Africa and Asia compared to Europe and Oceania.
+
+## Fifth exercise
 
 *Find countries with interesting stories. Open-ended and, therefore,
 hard. Promising but unsuccessful attempts are encouraged. This will
@@ -376,64 +395,143 @@ gapminder %>%
   facet_wrap("year", scales = "free")
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 So, we can see that there has been some change since the 1950s with
 respect to which countries occupy the lowest 5%.
 
-On another note, those plots are bit hard to read. Text is overlapping.
-To illustrate the predominance of Africa and absence of other continents
-in the low life expectancy category, let’s use a scatter plot\!
+It is interesting to see Sierra Leone has been at the bottom 5% in 1952
+and into the 21st century. Let’s see the change in life expectancy over
+time for Sierra Leone vs. change in life expectancy for a 95% country.
+
+First, let’s identify a 95% country to compare Sierra Leone to.
 
 ``` r
 gapminder %>% 
- group_by(continent, country) %>% 
- filter(year > 1999) %>% 
- filter(lifeExp<43.80) %>% 
- ggplot(aes(year, lifeExp)) + 
- geom_point(aes(colour = continent), position = "jitter")+
-  facet_wrap("year", scales = "free")
-```
-
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
-
-``` r
-gapminder %>% 
- group_by(continent, country) %>% 
  filter(year>1950, year<1960) %>% 
- filter(lifeExp<33.6) %>% 
- ggplot(aes(year, lifeExp)) + 
- geom_point(aes(colour = continent), position = "jitter")+
- facet_wrap("year", scales = "free")
+ summarise(ranker = quantile(lifeExp, prob = c(.95)))
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+    ## # A tibble: 1 x 1
+    ##   ranker
+    ##    <dbl>
+    ## 1   69.9
 
-Let’s see if
+``` r
+gapminder %>%  
+ filter(year>1950, year<1960) %>% 
+ filter(lifeExp>69.9)
+```
+
+    ## # A tibble: 15 x 6
+    ##    country        continent  year lifeExp      pop gdpPercap
+    ##    <fct>          <fct>     <int>   <dbl>    <int>     <dbl>
+    ##  1 Australia      Oceania    1957    70.3  9712569    10950.
+    ##  2 Canada         Americas   1957    70.0 17010154    12490.
+    ##  3 Denmark        Europe     1952    70.8  4334000     9692.
+    ##  4 Denmark        Europe     1957    71.8  4487831    11100.
+    ##  5 Iceland        Europe     1952    72.5   147962     7268.
+    ##  6 Iceland        Europe     1957    73.5   165110     9244.
+    ##  7 Netherlands    Europe     1952    72.1 10381988     8942.
+    ##  8 Netherlands    Europe     1957    73.0 11026383    11276.
+    ##  9 New Zealand    Oceania    1957    70.3  2229407    12247.
+    ## 10 Norway         Europe     1952    72.7  3327728    10095.
+    ## 11 Norway         Europe     1957    73.4  3491938    11654.
+    ## 12 Sweden         Europe     1952    71.9  7124673     8528.
+    ## 13 Sweden         Europe     1957    72.5  7363802     9912.
+    ## 14 Switzerland    Europe     1957    70.6  5126000    17909.
+    ## 15 United Kingdom Europe     1957    70.4 51430000    11283.
 
 ``` r
 gapminder %>% 
- group_by(continent) %>% 
- select(continent, year, pop) %>% 
- mutate(change = pop - lag(pop))
+ filter(year>1999) %>% 
+ summarise(ranker = quantile(lifeExp, prob = c(.95)))
 ```
 
-    ## # A tibble: 1,704 x 4
-    ## # Groups:   continent [5]
-    ##    continent  year      pop   change
-    ##    <fct>     <int>    <int>    <int>
-    ##  1 Asia       1952  8425333       NA
-    ##  2 Asia       1957  9240934   815601
-    ##  3 Asia       1962 10267083  1026149
-    ##  4 Asia       1967 11537966  1270883
-    ##  5 Asia       1972 13079460  1541494
-    ##  6 Asia       1977 14880372  1800912
-    ##  7 Asia       1982 12881816 -1998556
-    ##  8 Asia       1987 13867957   986141
-    ##  9 Asia       1992 16317921  2449964
-    ## 10 Asia       1997 22227415  5909494
-    ## # ... with 1,694 more rows
+    ## # A tibble: 1 x 1
+    ##   ranker
+    ##    <dbl>
+    ## 1   80.5
 
 ``` r
- #first, we group by continent. Then, for clarity's sake, I selected only for the variables of interest. Then we add a column to the data which calculates the change in population every 5 years for each continent.
+gapminder %>% 
+  group_by(country) %>% 
+ filter(year>1999) %>% 
+ filter(lifeExp>80.5)
 ```
+
+    ## # A tibble: 14 x 6
+    ## # Groups:   country [11]
+    ##    country          continent  year lifeExp       pop gdpPercap
+    ##    <fct>            <fct>     <int>   <dbl>     <int>     <dbl>
+    ##  1 Australia        Oceania    2007    81.2  20434176    34435.
+    ##  2 Canada           Americas   2007    80.7  33390141    36319.
+    ##  3 France           Europe     2007    80.7  61083916    30470.
+    ##  4 Hong Kong, China Asia       2002    81.5   6762476    30209.
+    ##  5 Hong Kong, China Asia       2007    82.2   6980412    39725.
+    ##  6 Iceland          Europe     2007    81.8    301931    36181.
+    ##  7 Israel           Asia       2007    80.7   6426679    25523.
+    ##  8 Italy            Europe     2007    80.5  58147733    28570.
+    ##  9 Japan            Asia       2002    82   127065841    28605.
+    ## 10 Japan            Asia       2007    82.6 127467972    31656.
+    ## 11 Spain            Europe     2007    80.9  40448191    28821.
+    ## 12 Sweden           Europe     2007    80.9   9031088    33860.
+    ## 13 Switzerland      Europe     2002    80.6   7361757    34481.
+    ## 14 Switzerland      Europe     2007    81.7   7554661    37506.
+
+We see that Canada has been in the 95%. Can we compare the change in
+life expectancy for these two countries?
+
+``` r
+gapminder %>% 
+ group_by(country) %>% 
+ mutate(change = lifeExp - lag(lifeExp)) %>% 
+  filter(country == "Sierra Leone"| country =="Canada")
+```
+
+    ## # A tibble: 24 x 7
+    ## # Groups:   country [2]
+    ##    country continent  year lifeExp      pop gdpPercap change
+    ##    <fct>   <fct>     <int>   <dbl>    <int>     <dbl>  <dbl>
+    ##  1 Canada  Americas   1952    68.8 14785584    11367. NA    
+    ##  2 Canada  Americas   1957    70.0 17010154    12490.  1.21 
+    ##  3 Canada  Americas   1962    71.3 18985849    13462.  1.34 
+    ##  4 Canada  Americas   1967    72.1 20819767    16077.  0.830
+    ##  5 Canada  Americas   1972    72.9 22284500    18971.  0.75 
+    ##  6 Canada  Americas   1977    74.2 23796400    22091.  1.33 
+    ##  7 Canada  Americas   1982    75.8 25201900    22899.  1.55 
+    ##  8 Canada  Americas   1987    76.9 26549700    26627.  1.10 
+    ##  9 Canada  Americas   1992    78.0 28523502    26343.  1.09 
+    ## 10 Canada  Americas   1997    78.6 30305843    28955.  0.660
+    ## # ... with 14 more rows
+
+``` r
+ #first, we group by country Then we add a column to the data which calculates the change in population every 5 years for Sierra Leone and CAnada.
+```
+
+Let’s see if we can make a graph comparing the change in life expectancy
+over time for these two countries.
+
+``` r
+gapminder %>% 
+ group_by(country) %>% 
+ mutate(change = lifeExp - lag(lifeExp)) %>% 
+  filter(country == "Sierra Leone"| country =="Canada") %>% 
+  ggplot(aes(year, change))+
+  geom_point(aes(colour = country))+
+  geom_line(aes(colour = country))
+```
+
+    ## Warning: Removed 2 rows containing missing values (geom_point).
+
+    ## Warning: Removed 2 rows containing missing values (geom_path).
+
+![](gapminder-hw03_files/figure-gfm/Sierra%20Leone%20vs%20Canada-1.png)<!-- -->
+
+We see that the countries are fairly similar until 1992, when a major
+event must have occured in Sierra Leone that lead to a disproportionate
+number of young people dying. Could it be war? famine? natural disaster?
+
+A google search notes that this is around the beginning of a Civil War.
+
+## That’s it. Thanks for reading\!
