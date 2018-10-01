@@ -86,7 +86,7 @@ gapminder %>%
  geom_point(alpha = 0.05)
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/distribution%20graphs-1.png)<!-- -->
 
 ``` r
 gapminder %>% 
@@ -95,7 +95,7 @@ gapminder %>%
  geom_boxplot()
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/distribution%20graphs-2.png)<!-- -->
 
 \#\#Second exercise
 
@@ -137,7 +137,7 @@ gapminder %>%
   geom_point(aes(colour = continent))
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/lifeExp%20over%20time,%20weighted-1.png)<!-- -->
 
 ``` r
 #graphical representation of second exercise
@@ -148,33 +148,6 @@ which illustrate how life expectancy changes over time. How is life
 expectancy changing over time on different continents?
 
 ``` r
-gapminder %>% 
- group_by(continent) %>% 
- select(continent, year, pop) %>% 
- mutate(pop_change = pop - lag(pop))
-```
-
-    ## # A tibble: 1,704 x 4
-    ## # Groups:   continent [5]
-    ##    continent  year      pop pop_change
-    ##    <fct>     <int>    <int>      <int>
-    ##  1 Asia       1952  8425333         NA
-    ##  2 Asia       1957  9240934     815601
-    ##  3 Asia       1962 10267083    1026149
-    ##  4 Asia       1967 11537966    1270883
-    ##  5 Asia       1972 13079460    1541494
-    ##  6 Asia       1977 14880372    1800912
-    ##  7 Asia       1982 12881816   -1998556
-    ##  8 Asia       1987 13867957     986141
-    ##  9 Asia       1992 16317921    2449964
-    ## 10 Asia       1997 22227415    5909494
-    ## # ... with 1,694 more rows
-
-``` r
- #first, we group by continent. Then, for clarity's sake, I selected only for the variables of interest. Then we add a column to the data which calculates the change in population every 5 years for each continent.
-```
-
-``` r
 gapminder %>%
   group_by(continent, year) %>% 
   summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop)) %>% 
@@ -182,10 +155,10 @@ gapminder %>%
   geom_line(aes(colour = continent))
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/change%20in%20lifeexp%20over%20time,%20graph-1.png)<!-- -->
 
 ``` r
-#we can even make it a line plot. More still, we can put a regression line to trend overall growth in weighted lifeExp across continents.
+#we can even make it a line plot. More still, we can put a regression line to trend overall trend in weighted lifeExp across all continents.
 
 gapminder %>%
   group_by(continent, year) %>% 
@@ -197,7 +170,7 @@ gapminder %>%
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/change%20in%20lifeexp%20over%20time,%20graph-2.png)<!-- -->
 
 \#\#Fourth exercise
 
@@ -265,7 +238,7 @@ gapminder %>%
  geom_jitter(aes(colour = (lifeExp < median)), alpha = 0.5)
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/median%20lifeExp%20as%20a%20benchmark-1.png)<!-- -->
 
 ``` r
 #We can also use the `if_else` function to help us identify which countries are less than the benchmark median for each year. Let's identify those countries with low life expectancy with the word "lower".
@@ -349,7 +322,7 @@ gapminder %>%
   facet_wrap("year", scales = "free")
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/text%20graph%20fifth%20percentile-1.png)<!-- -->
 
 So we can see that the 5th percentile for lowest life expectancy is
 comprised solely of African countries and Afghanistan. Is this something
@@ -358,26 +331,59 @@ over away fromt he lowest 5% in the world??
 
 ``` r
 gapminder %>% 
+ filter(year>1950, year<1960) %>% 
+ summarise(ranker = quantile(lifeExp, prob = c(.05)))
+```
+
+    ## # A tibble: 1 x 1
+    ##   ranker
+    ##    <dbl>
+    ## 1   33.6
+
+``` r
+gapminder %>% 
  group_by(continent, country) %>% 
  filter(year>1950, year<1960) %>% 
- filter(lifeExp<43.80) %>% 
+ filter(lifeExp<33.6)
+```
+
+    ## # A tibble: 14 x 6
+    ## # Groups:   continent, country [9]
+    ##    country       continent  year lifeExp     pop gdpPercap
+    ##    <fct>         <fct>     <int>   <dbl>   <int>     <dbl>
+    ##  1 Afghanistan   Asia       1952    28.8 8425333      779.
+    ##  2 Afghanistan   Asia       1957    30.3 9240934      821.
+    ##  3 Angola        Africa     1952    30.0 4232095     3521.
+    ##  4 Angola        Africa     1957    32.0 4561361     3828.
+    ##  5 Burkina Faso  Africa     1952    32.0 4469979      543.
+    ##  6 Gambia        Africa     1952    30    284320      485.
+    ##  7 Gambia        Africa     1957    32.1  323150      521.
+    ##  8 Guinea-Bissau Africa     1952    32.5  580653      300.
+    ##  9 Guinea-Bissau Africa     1957    33.5  601095      432.
+    ## 10 Mozambique    Africa     1952    31.3 6446316      469.
+    ## 11 Sierra Leone  Africa     1952    30.3 2143249      880.
+    ## 12 Sierra Leone  Africa     1957    31.6 2295678     1004.
+    ## 13 Somalia       Africa     1952    33.0 2526994     1136.
+    ## 14 Yemen, Rep.   Asia       1952    32.5 4963829      782.
+
+``` r
+gapminder %>% 
+ group_by(continent, country) %>% 
+ filter(year>1950, year<1960) %>% 
+ filter(lifeExp<33.6) %>% 
  ggplot(aes(year, lifeExp)) + 
  geom_text(aes(label = country), position = "jitter")+
   facet_wrap("year", scales = "free")
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
-So, we can see that there has been some change since the 1950s. Now, low
-life expectancy is predominantly observed in African countries +
-Afghanistan which has been recently affected by war. Also, we notice in
-the 21st century, there are less countries comprising of the bottom 5%.
-The smaller the number of countries occuppying the 5th percentile, the
-greater their disparity from the mean…
+So, we can see that there has been some change since the 1950s with
+respect to which countries occupy the lowest 5%.
 
-On another note, those plots are bit harder to read. Text is overlapping
-and we can’t quite tell which countries are which in that type of graph.
-Let’s tidy it up with a scatterplot, colour coded for continent\!
+On another note, those plots are bit hard to read. Text is overlapping.
+To illustrate the predominance of Africa and absence of other continents
+in the low life expectancy category, let’s use a scatter plot\!
 
 ``` r
 gapminder %>% 
@@ -389,16 +395,45 @@ gapminder %>%
   facet_wrap("year", scales = "free")
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 gapminder %>% 
  group_by(continent, country) %>% 
  filter(year>1950, year<1960) %>% 
- filter(lifeExp<43.80) %>% 
+ filter(lifeExp<33.6) %>% 
  ggplot(aes(year, lifeExp)) + 
  geom_point(aes(colour = continent), position = "jitter")+
  facet_wrap("year", scales = "free")
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+
+Let’s see if
+
+``` r
+gapminder %>% 
+ group_by(continent) %>% 
+ select(continent, year, pop) %>% 
+ mutate(change = pop - lag(pop))
+```
+
+    ## # A tibble: 1,704 x 4
+    ## # Groups:   continent [5]
+    ##    continent  year      pop   change
+    ##    <fct>     <int>    <int>    <int>
+    ##  1 Asia       1952  8425333       NA
+    ##  2 Asia       1957  9240934   815601
+    ##  3 Asia       1962 10267083  1026149
+    ##  4 Asia       1967 11537966  1270883
+    ##  5 Asia       1972 13079460  1541494
+    ##  6 Asia       1977 14880372  1800912
+    ##  7 Asia       1982 12881816 -1998556
+    ##  8 Asia       1987 13867957   986141
+    ##  9 Asia       1992 16317921  2449964
+    ## 10 Asia       1997 22227415  5909494
+    ## # ... with 1,694 more rows
+
+``` r
+ #first, we group by continent. Then, for clarity's sake, I selected only for the variables of interest. Then we add a column to the data which calculates the change in population every 5 years for each continent.
+```
