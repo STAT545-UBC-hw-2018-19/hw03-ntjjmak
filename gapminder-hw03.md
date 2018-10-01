@@ -160,8 +160,7 @@ gapminder %>%
 ![](gapminder-hw03_files/figure-gfm/change%20in%20lifeexp%20over%20time,%20graph-1.png)<!-- -->
 
 ``` r
-#we can even make it a line plot. More still, we can put a regression line to trend overall trend in weighted lifeExp across all continents.
-
+#we can even make it a line plot. More still, we can put a regression line to trend overall trend in weighted lifeExp across all continents
 gapminder %>%
   group_by(continent, year) %>% 
   summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop)) %>% 
@@ -172,7 +171,7 @@ gapminder %>%
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-![](gapminder-hw03_files/figure-gfm/change%20in%20lifeexp%20over%20time,%20graph-2.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 You can see that most continents are following the same trajectory in
 life expectancy increase starting from the 50s (slopes are visually
@@ -279,7 +278,7 @@ gapminder %>%
   facet_wrap(~ continent)
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 We can really see the disproportionate number of countries with low life
 expectancy in Africa and Asia compared to Europe and Oceania.
@@ -395,7 +394,7 @@ gapminder %>%
   facet_wrap("year", scales = "free")
 ```
 
-![](gapminder-hw03_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](gapminder-hw03_files/figure-gfm/50s%20lifeExp-1.png)<!-- -->
 
 So, we can see that there has been some change since the 1950s with
 respect to which countries occupy the lowest 5%.

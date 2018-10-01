@@ -61,6 +61,7 @@ others do! The range for the continents of Africa and Asia is
 staggering….
 
 Let’s make a graphs to illustrate this!
+
 ```{r distribution graphs}
 gapminder %>% 
  group_by(continent) %>%
@@ -84,6 +85,7 @@ gapminder %>%
 
 #This is a calculation of the weighted mean life expectancy by population for each continent. The means are separated by year so we can observe trends of change in lifeExp over time.
 ```
+
 
 ```{r lifeExp over time, weighted}
 gapminder %>% 
@@ -109,9 +111,12 @@ gapminder %>%
   summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop)) %>% 
   ggplot(aes(year, mean_lifeExp_weighted))+
   geom_line(aes(colour = continent))
+```
 
-#we can even make it a line plot. More still, we can put a regression line to trend overall trend in weighted lifeExp across all continents.
 
+```{r}
+
+#we can even make it a line plot. More still, we can put a regression line to trend overall trend in weighted lifeExp across all continents
 gapminder %>%
   group_by(continent, year) %>% 
   summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop)) %>% 
@@ -120,6 +125,8 @@ gapminder %>%
   geom_smooth()
 
 ```
+
+
 
 You can see that most continents are following the same trajectory in life expectancy increase starting from the 50s (slopes are visually comparable). Asia is the only continent to rise above and start to catch up to the continents that it was behind of at teh start of the mid 20th century.
 
@@ -155,7 +162,9 @@ gapminder %>%
 
 ```
 
+
 Anyways, back to determining the relative abundance of countries with low life expectancy by continent....
+
 ```{r}
 #Step 3: Visually approximate the number of countries with life expectancy below the median. Use aesthetics to set parameters which demonstrate countries not meeting or exceeding the benchmark. Then use facetting to demonstrate the difference between continents.
  
@@ -191,6 +200,7 @@ gapminder %>%
 ```
 
 ```{r text graph fifth percentile}
+
 gapminder %>% 
   group_by(continent, country) %>% 
   filter(year>1999) %>% 
@@ -215,7 +225,8 @@ gapminder %>%
  filter(lifeExp<33.6)
 ```
 
-```{r}
+
+```{r 50s lifeExp}
 
 gapminder %>% 
  group_by(continent, country) %>% 
@@ -270,7 +281,9 @@ gapminder %>%
 
 Let's see if we can make a graph comparing the change in life expectancy over time for these two countries.
 
+
 ```{r Sierra Leone vs Canada}
+
 gapminder %>% 
  group_by(country) %>% 
  mutate(change = lifeExp - lag(lifeExp)) %>% 
@@ -279,6 +292,7 @@ gapminder %>%
   geom_point(aes(colour = country))+
   geom_line(aes(colour = country))
 ```
+
 
 We see that the countries are fairly similar until 1992, when a major event must have occured in Sierra Leone that lead to a disproportionate number of young people dying. Could it be war? famine? natural disaster?
 
