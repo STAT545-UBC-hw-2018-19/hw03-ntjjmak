@@ -1,7 +1,7 @@
 ---
-title: "gapminder-hw03"
+title: "gapminder-hw003"
 author: "Nicole Mak"
-date: "28/09/2018"
+date: "01/10/2018"
 output: github_document
 ---
 
@@ -9,7 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-**First, let's load the data and the packages we will use.**
+**First, let’s load the data and the packages we will use.**
 
 ```{r}
 library(gapminder)
@@ -18,55 +18,215 @@ library(dplyr)
 library(ggplot2)
 ```
 
-# Homework #3 assignment **Task Menu**:
-
-Get the maximum and minimum of GDP per capita for all continents.
-Look at the spread of GDP per capita within the continents.
 
 
-Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean.
+# Homework \#3 assignment **Task Menu**:
+
+Get the maximum and minimum of GDP per capita for all continents. Look
+at the spread of GDP per capita within the continents.
+
+Compute a trimmed mean of life expectancy for different years. Or a
+weighted mean, weighting by population. Just try something other than
+the plain vanilla mean.
 
 How is life expectancy changing over time on different continents?
 
-Report the absolute and/or relative abundance of countries with low life expectancy over time by continent: Compute some measure of worldwide life expectancy – you decide – a mean or median or some other quantile or perhaps your current age. Then determine how many countries on each continent have a life expectancy less than this benchmark, for each year.
+Report the absolute and/or relative abundance of countries with low life
+expectancy over time by continent: Compute some measure of worldwide
+life expectancy – you decide – a mean or median or some other quantile
+or perhaps your current age. Then determine how many countries on each
+continent have a life expectancy less than this benchmark, for each
+year.
 
-Find countries with interesting stories. Open-ended and, therefore, hard. Promising but unsuccessful attempts are encouraged. This will generate interesting questions to follow up on in class.
+Find countries with interesting stories. Open-ended and, therefore,
+hard. Promising but unsuccessful attempts are encouraged. This will
+generate interesting questions to follow up on in class.
 
 ## First exercise:
 
-Get the maximum and minimum of GDP per capita for all continents.
-Look at the spread of GDP per capita within the continents.
+*Get the maximum and minimum of GDP per capita for all continents. Look
+at the spread of GDP per capita within the continents.*
 
 ```{r}
 gapminder %>% 
-  group_by(continent) %>% 
-  summarize(min(gdpPercap), max(gdpPercap))
+ group_by(continent) %>% 
+ summarize(min(gdpPercap), max(gdpPercap))
 
 #structuring data by continent
 #then requesting that desired observation (minimum and maximum) be summarized in a table, by continent
-
 ```
 
-## Second exercise
-Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean.
+What we observe is that some continents have a larger disparity than
+others do! The range for the continents of Africa and Asia is
+staggering….
+
+Let’s make a graphs to illustrate this!
+```{r}
+gapminder %>% 
+ group_by(continent) %>%
+ ggplot(aes(continent, log(gdpPercap))) +
+ geom_point(alpha = 0.05)
+ 
+gapminder %>% 
+ group_by(continent) %>%
+ ggplot(aes(continent, log(gdpPercap))) +
+ geom_boxplot()
+```
+
+##Second exercise
+
+*Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean.*
 
 ```{r}
 gapminder %>% 
-  group_by(continent, year) %>% 
-  summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop))
+ group_by(continent, year) %>% 
+ summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop))
 
 #This is a calculation of the weighted mean life expectancy by population for each continent. The means are separated by year so we can observe trends of change in lifeExp over time.
+```
 
+```{r}
+gapminder %>% 
+ group_by(continent, year) %>%
+ summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop)) %>% 
+ ggplot(aes(year, mean_lifeExp_weighted))+
+  geom_point(aes(colour = continent))
+
+#graphical representation of second exercise
+```
+
+
+##Third exercise
+We can use the above information to make some figures which illustrate how life expectancy changes over time.
+How is life expectancy changing over time on different continents?
+
+
+```{r}
+gapminder %>% 
+ group_by(continent) %>% 
+ select(continent, year, pop) %>% 
+ mutate(pop_change = pop - lag(pop))
+ 
+ #first, we group by continent. Then, for clarity's sake, I selected only for the variables of interest. Then we add a column to the data which calculates the change in population every 5 years for each continent.
+```
+
+```{r}
+gapminder %>%
+  group_by(continent, year) %>% 
+  summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop)) %>% 
+  ggplot(aes(year, mean_lifeExp_weighted))+
+  geom_line(aes(colour = continent))
+
+#we can even make it a line plot. More still, we can put a regression line to trend overall growth in weighted lifeExp across continents.
+
+gapminder %>%
+  group_by(continent, year) %>% 
+  summarise(mean_lifeExp_weighted = weighted.mean(lifeExp, pop)) %>% 
+  ggplot(aes(year, mean_lifeExp_weighted))+
+  geom_point(aes(colour = continent))+
+  geom_smooth()
 
 ```
 
-## Third exercise
+##Fourth exercise
 
-We can use the above information to make some figures which illustrate how life expectancy changes over time.
+*Report the absolute and/or relative abundance of countries with low life expectancy over time by continent: Compute some measure of worldwide life expectancy – you decide – a mean or median or some other quantile or perhaps your current age. Then determine how many countries on each continent have a life expectancy less than this benchmark, for each year.*
 
-How is life expectancy changing over time on different continents?
+```{r}
+#Step 1: compute the median life Exp worldwide per year measured.
+gapminder %>%
+ group_by(year) %>% 
+ summarise(median = median(lifeExp))
+ 
+#Step 2: Determine which countries have a life expectancy below the median.
+gapminder %>%
+ group_by(year) %>% 
+ mutate(median = median(lifeExp)) %>% 
+ filter(lifeExp<median)
+ 
+ 
+#Step 3: Visually approximate the number of countries with life expectancy below the median. Use aesthetics to set parameters which demonstrate countries not meeting or exceeding the benchmark.
+ 
+gapminder %>%
+ group_by(year) %>% 
+ mutate(median = median(lifeExp)) %>%
+ ggplot(aes(year, lifeExp)) +
+ geom_jitter(aes(colour = (lifeExp < median)), alpha = 0.5)
+```
+```{r}
+#We can also use the `if_else` function to help us identify which countries are less than the benchmark median for each year. Let's identify those countries with low life expectancy with the word "lower".
+
+gapminder %>%
+ group_by(year) %>% 
+ mutate(median = median(lifeExp)) %>%
+ mutate (benchmark = if_else(lifeExp<median, "lower", "higher"))
+```
+
+##Fifth exercise
+
+*Find countries with interesting stories. Open-ended and, therefore,
+hard. Promising but unsuccessful attempts are encouraged. This will
+generate interesting questions to follow up on in class.*
+
+Let's look at the countries in the 5th percentile for low life expectancy in the 21st century...
 
 ```{r}
 
+gapminder %>% 
+ filter(year > 1999) %>% 
+ summarise(ranker = quantile(lifeExp, prob = c(.05)))
+
+
+gapminder %>% 
+ group_by(continent, country) %>% 
+ filter(year > 1999) %>% 
+ filter(lifeExp<43.80)
 ```
 
+```{r}
+gapminder %>% 
+  group_by(continent, country) %>% 
+  filter(year>1999) %>% 
+  filter(lifeExp<43.8) %>% 
+  ggplot(aes(year, lifeExp)) +
+  geom_text(aes(label = country), position = "jitter") +
+  facet_wrap("year", scales = "free")
+```
+
+So we can see that the 5th percentile for lowest life expectancy is comprised solely of African countries and Afghanistan.
+Is this something that existed prior to the 21st century? Is there any countries crossing over away fromt he lowest 5% in the world??
+
+```{r}
+
+gapminder %>% 
+ group_by(continent, country) %>% 
+ filter(year>1950, year<1960) %>% 
+ filter(lifeExp<43.80) %>% 
+ ggplot(aes(year, lifeExp)) + 
+ geom_text(aes(label = country), position = "jitter")+
+  facet_wrap("year", scales = "free")
+```
+
+
+So, we can see that there has been some change since the 1950s. Now, low life expectancy is predominantly observed in African countries + Afghanistan which has been recently affected by war. Also, we notice in the 21st century, there are less countries comprising of the bottom 5%. The smaller the number of countries occuppying the 5th percentile, the greater their disparity from the mean...
+
+On another note, those plots are bit harder to read. Text is overlapping and we can't quite tell which countries are which in that type of graph. Let's tidy it up with a scatterplot, colour coded for continent!
+
+```{r}
+gapminder %>% 
+ group_by(continent, country) %>% 
+ filter(year > 1999) %>% 
+ filter(lifeExp<43.80) %>% 
+ ggplot(aes(year, lifeExp)) + 
+ geom_point(aes(colour = continent), position = "jitter")+
+  facet_wrap("year", scales = "free")
+ 
+gapminder %>% 
+ group_by(continent, country) %>% 
+ filter(year>1950, year<1960) %>% 
+ filter(lifeExp<43.80) %>% 
+ ggplot(aes(year, lifeExp)) + 
+ geom_point(aes(colour = continent), position = "jitter")+
+ facet_wrap("year", scales = "free")
+
+```
